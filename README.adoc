@@ -1,0 +1,72 @@
+= BPMS-OCP
+
+== ocp-credit-service
+
+. create project
++
+-----
+oadm new-project creditservice --display-name="Credit Service" --admin=jbride-redhat.com
+-----
+
+. provision
++
+-----
+oc new-app jboss-eap70-openshift~https://github.com/RHsyseng/BPMS-OCP/ \
+--context-dir=ocp-credit-service \
+--name=cs-service
+-----
+
+. route
++
+-----
+http://cs-service-creditservice.cloudapps.na.openshift.opentlc.com/creditservice/CreditService?wsdl
+-----
+
+
+
+
+== ocp-mortgage-rules
+
+. create project
++
+-----
+oadm new-project mortgage-rules --display-name="Mortgage Loan Rules" --admin=jbride-redhat.com
+-----
+
+. provision
++
+----
+oc new-app jboss-processserver63-openshift~https://github.com/jbride/BPMS-OCP \
+--context-dir=ocp-mortgage-rules \
+--name=mortgage-rule
+-----
+
+. modify bpmn2
++
+-----
+src/main/resources/com/redhat/bpms/examples/mortgage/MortgageApplication.bpmn2
+http://cs.bxms.ose/creditservice/CreditService?WSDL
+-----
+
+
+
+== ocp-mortgage-dashboard
+
+. create project
++
+-----
+oadm new-project mortgage-dashboard --display-name="Mortgage Dashboard" --admin=jbride-redhat.com
+-----
+
+. provision
++
+-----
+oc new-app jboss-eap70-openshift~https://github.com/RHsyseng/BPMS-OCP \
+--context-dir=ocp-mortgage-dashboard \
+--name=mortgage-dashboard
+-----
+
+oc new-app jboss-processserver63-openshift~https://github.com/RHsyseng/BPMS-OCP \
+--context-dir=ocp-mortgage-dashboard \
+--name=mort-dashboard \
+-e SECDOMAIN_USERS_PROPERTIES=bpm_users.properties,SECDOMAIN_ROLES_PROPERTIES=bpm_roles.properties,SECDOMAIN_NAME=bpm_domain,SECDOMAIN_PASSWORD_STACKING=true
