@@ -35,7 +35,7 @@ oadm new-project mortgage-rules --display-name="Mortgage Loan Rules" --admin=jbr
 
 . provision
 +
-----
+-----
 oc new-app jboss-processserver63-openshift~https://github.com/jbride/BPMS-OCP \
 --context-dir=ocp-mortgage-rules \
 --name=mortgage-rule
