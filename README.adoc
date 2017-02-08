@@ -33,6 +33,13 @@ http://cs-service-creditservice.cloudapps.na.openshift.opentlc.com/creditservice
 oadm new-project mortgage-rules --display-name="Mortgage Loan Rules" --admin=jbride-redhat.com
 -----
 
+. modify bpmn2
++
+-----
+src/main/resources/com/redhat/bpms/examples/mortgage/MortgageApplication.bpmn2
+http://cs.bxms.ose/creditservice/CreditService?WSDL
+-----
+
 . provision
 +
 -----
@@ -41,11 +48,29 @@ oc new-app jboss-processserver63-openshift~https://github.com/jbride/BPMS-OCP \
 --name=mortgage-rule
 -----
 
-. modify bpmn2
+. route
 +
 -----
-src/main/resources/com/redhat/bpms/examples/mortgage/MortgageApplication.bpmn2
-http://cs.bxms.ose/creditservice/CreditService?WSDL
+oc expose service mortgage-rule
+-----
+
+. swagger URL
++
+-----
+mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/docs
+-----
+
+. status url
++
+-----
+mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/services/rest/server
+-----
+.. use:   kieserver / kieserver1!
+
+. delete
++
+-----
+oc delete all -l app=mortgage-rule
 -----
 
 
@@ -58,15 +83,23 @@ http://cs.bxms.ose/creditservice/CreditService?WSDL
 oadm new-project mortgage-dashboard --display-name="Mortgage Dashboard" --admin=jbride-redhat.com
 -----
 
+. modify
++
+-----
+src/main/java/com/redhat/bpms/examples/Configuration.java
+public static final String REST_BASE_URI = "http://rules.bxms.ose/kie-server/services/rest/server
+-----
+
 . provision
 +
 -----
-oc new-app jboss-eap70-openshift~https://github.com/RHsyseng/BPMS-OCP \
+oc new-app jboss-eap70-openshift~https://github.com/jbride/BPMS-OCP \
 --context-dir=ocp-mortgage-dashboard \
 --name=mortgage-dashboard
 -----
 
-oc new-app jboss-processserver63-openshift~https://github.com/RHsyseng/BPMS-OCP \
---context-dir=ocp-mortgage-dashboard \
---name=mort-dashboard \
--e SECDOMAIN_USERS_PROPERTIES=bpm_users.properties,SECDOMAIN_ROLES_PROPERTIES=bpm_roles.properties,SECDOMAIN_NAME=bpm_domain,SECDOMAIN_PASSWORD_STACKING=true
+. delete
++
+-----
+oc delete all -l app=mortgage-dashboard
+-----
