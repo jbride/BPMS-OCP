@@ -98,6 +98,19 @@ oc new-app jboss-eap70-openshift~https://github.com/jbride/BPMS-OCP \
 --name=mortgage-dashboard
 -----
 
+. route
++
+-----
+oc expose service mortgage-dashboard
+-----
+
+. url
++
+-----
+http://mortgage-dashboard-mortgage-dashboard.cloudapps.na.openshift.opentlc.com/ocp-mortgage-dashboard/
+-----
+
+
 . delete
 +
 -----
