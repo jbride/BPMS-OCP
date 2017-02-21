@@ -28,13 +28,19 @@ public class RestClientService {
 
     protected final String PROCESS_ID = "com.redhat.bpms.examples.mortgage.MortgageApplication";
 
+
     KieServicesClient initClient(Configuration.Users user) {
+
+        // Expecting something similar to the following: http://mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/services/rest/server
+        String restBaseUri = System.getProperty(Configuration.KIE_API_REST_URI);
+        if(restBaseUri == null || restBaseUri.equals(""))
+            throw new RuntimeException("initClient:  Need to specify system property: "+Configuration.KIE_API_REST_URI);
 
         KieServicesClient client = null;
         try {
 
             KieServicesConfiguration conf = KieServicesFactory.newRestConfiguration(
-                    Configuration.REST_BASE_URI,
+                    restBaseUri,
                     user.username(),
                     user.password());
 
