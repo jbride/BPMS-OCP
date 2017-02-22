@@ -43,6 +43,8 @@ public class RestClientService {
         // Expecting something similar to the following: http://mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/services/rest/server
         String restBaseUri = "http://"+kieServerFQDN+"/kie-server/services/rest/server";
 
+        logger.info("initClient() using kie server URI of: "+restBaseUri);
+
         KieServicesClient client = null;
         try {
 
