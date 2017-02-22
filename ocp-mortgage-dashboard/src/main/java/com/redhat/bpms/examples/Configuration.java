@@ -9,8 +9,7 @@ import java.util.Map;
  */
 public final class Configuration {
 
-    //public static final String REST_BASE_URI = "http://mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/services/rest/server";
-    public static final String KIE_API_REST_URI = "KIE_API_REST_URI";
+    public static final String KIE_API_REST_FQDN = "KIE_API_REST_FQDN";
 
     public static enum Users {
 
