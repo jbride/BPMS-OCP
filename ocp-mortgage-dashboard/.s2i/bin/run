@@ -1,0 +1,5 @@
+#!/bin/sh
+
+env > /tmp/env.log
+
+exec $JBOSS_HOME/bin/openshift-launch.sh
