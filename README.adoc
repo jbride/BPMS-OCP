@@ -2,16 +2,10 @@
 
 == ocp-credit-service
 
-. create project
-+
------
-oadm new-project creditservice --display-name="Credit Service" --admin=jbride-redhat.com
------
-
 . provision
 +
 -----
-oc new-app jboss-eap70-openshift~https://github.com/RHsyseng/BPMS-OCP/ \
+oc new-app jboss-eap70-openshift~https://github.com/jbride/BPMS-OCP/ \
 --context-dir=ocp-credit-service \
 --name=cs-service
 -----
@@ -19,33 +13,35 @@ oc new-app jboss-eap70-openshift~https://github.com/RHsyseng/BPMS-OCP/ \
 . route
 +
 -----
-http://cs-service-creditservice.cloudapps.na.openshift.opentlc.com/creditservice/CreditService?wsdl
+oc expose service cs-service
 -----
 
+. Determine route to WSDL of `cs-service`
++
+-----
+echo -en "\n`oc get route cs-service --template "http://{{.spec.host}}/creditservice/CreditService?wsdl"`\n\n"
+-----
++
+NOTE: Point your browser to this URL to view the WSDL.
 
+. Determine FQDN of exposed `cs-service` route
++
+-----
+echo -en "\n`oc get route cs-service --template "{{.spec.host}}"`\n\n"
+-----
++
+NOTE: The host name of the `cs-service` will be used later in this lab as the value of the following environment variable: `CREDIT_SERVICE_FQDN` 
 
 
 == ocp-mortgage-rules
-
-. create project
-+
------
-oadm new-project mortgage-rules --display-name="Mortgage Loan Rules" --admin=jbride-redhat.com
------
-
-. modify bpmn2
-+
------
-src/main/resources/com/redhat/bpms/examples/mortgage/MortgageApplication.bpmn2
-http://cs.bxms.ose/creditservice/CreditService?WSDL
------
 
 . provision
 +
 -----
 oc new-app jboss-processserver63-openshift~https://github.com/jbride/BPMS-OCP \
 --context-dir=ocp-mortgage-rules \
---name=mortgage-rule
+--name=mortgage-rule \
+-e CREDIT_SERVICE_FQDN=`oc get route cs-service --template "{{.spec.host}}"`
 -----
 
 . route
@@ -54,48 +50,29 @@ oc new-app jboss-processserver63-openshift~https://github.com/jbride/BPMS-OCP \
 oc expose service mortgage-rule
 -----
 
-. swagger URL
+. Point your browser to the value of the following to view the Swagger documentation of the `Decision Server` API:
 +
 -----
-mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/docs
+echo -en "\n`oc get route mortgage-rule --template "http://{{.spec.host}}/kie-server/docs"`\n\n"
 -----
 
-. status url
+. Point your browser to the value of the following to view the status of `kie-containers` deployed in your `Decision Server`:
 +
 -----
-mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/services/rest/server
------
-.. use:   kieserver / kieserver1!
-
-. delete
-+
------
-oc delete all -l app=mortgage-rule
+echo -en "\n`oc get route mortgage-rule --template "http://{{.spec.host}}/kie-server/services/rest/server"`\n\n"
 -----
 
-
+.. Authenticate using the following credentials:   kieserver / kieserver1!
 
 == ocp-mortgage-dashboard
-
-. create project
-+
------
-oadm new-project mortgage-dashboard --display-name="Mortgage Dashboard" --admin=jbride-redhat.com
------
-
-. modify
-+
------
-src/main/java/com/redhat/bpms/examples/Configuration.java
-public static final String REST_BASE_URI = "http://rules.bxms.ose/kie-server/services/rest/server
------
 
 . provision
 +
 -----
 oc new-app jboss-eap70-openshift~https://github.com/jbride/BPMS-OCP \
 --context-dir=ocp-mortgage-dashboard \
---name=mortgage-dashboard
+--name=mortgage-dashboard \
+-e KIE_API_REST_FQDN=`oc get route mortgage-rule --template "{{.spec.host}}"`
 -----
 
 . route
@@ -104,15 +81,34 @@ oc new-app jboss-eap70-openshift~https://github.com/jbride/BPMS-OCP \
 oc expose service mortgage-dashboard
 -----
 
-. url
+. Point your browser to the value of the following to access the `mortgage` application:
 +
 -----
-http://mortgage-dashboard-mortgage-dashboard.cloudapps.na.openshift.opentlc.com/ocp-mortgage-dashboard/
+echo -en "\n`oc get route mortgage-dashboard --template "http://{{.spec.host}}/ocp-mortgage-dashboard"`\n\n"
 -----
 
 
-. delete
+== Appendix
+
+=== Delete OCP objects from project
+
+The following are instructions for deletion of OCP resource per OCP `label` value:
+
+. `cs-service` 
++
+-----
+oc delete all -l app=cs-service
+-----
+
+. `mortgage-rule`
++
+-----
+oc delete all -l app=mortgage-rule
+-----
+
+. `mortgage-dashboard`
 +
 -----
 oc delete all -l app=mortgage-dashboard
 -----
+
