@@ -32,8 +32,13 @@ public class RestClientService {
     KieServicesClient initClient(Configuration.Users user) {
 
         String kieServerFQDN = System.getProperty(Configuration.KIE_API_REST_FQDN);
-        if(kieServerFQDN == null || kieServerFQDN.equals(""))
+        if(kieServerFQDN == null || kieServerFQDN.equals("")) {
+
+            java.util.Properties props = System.getProperties();
+            props.list(System.out);
+
             throw new RuntimeException("initClient:  Need to specify system property: "+Configuration.KIE_API_REST_FQDN);
+        }
 
         // Expecting something similar to the following: http://mortgage-rule-mortgage-rules.cloudapps.na.openshift.opentlc.com/kie-server/services/rest/server
         String restBaseUri = "http://"+kieServerFQDN+"/kie-server/services/rest/server";
